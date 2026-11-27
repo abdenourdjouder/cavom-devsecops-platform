@@ -1,0 +1,2 @@
+# Add a finding only with a matching, approved, unexpired exception.
+# Prefer upgrading or removing the affected dependency.

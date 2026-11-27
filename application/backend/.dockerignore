@@ -1,0 +1,8 @@
+target
+.mvn
+.idea
+*.iml
+*.log
+.env
+config.example.env
+Dockerfile

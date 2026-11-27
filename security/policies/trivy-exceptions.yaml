@@ -1,0 +1,9 @@
+version: 1
+exceptions: []
+# Example:
+# - id: CVE-2024-0000
+#   reason: Vendor-fixed version is unavailable for this runtime.
+#   owner: security-team
+#   expires: 2027-01-01
+#   targets:
+#     - frontend

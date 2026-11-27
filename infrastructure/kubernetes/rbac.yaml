@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cavom-deployer
+  namespace: cavom-frontend
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cavom-deployer
+  namespace: cavom-frontend
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["services", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cavom-deployer
+  namespace: cavom-frontend
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cavom-deployer
+subjects:
+  - kind: ServiceAccount
+    name: cavom-deployer
+    namespace: cavom-frontend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cavom-deployer
+  namespace: cavom-backend
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cavom-deployer
+  namespace: cavom-backend
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["services", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cavom-deployer
+  namespace: cavom-backend
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cavom-deployer
+subjects:
+  - kind: ServiceAccount
+    name: cavom-deployer
+    namespace: cavom-backend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cavom-deployer
+  namespace: cavom-database
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cavom-deployer
+  namespace: cavom-database
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["services", "persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cavom-deployer
+  namespace: cavom-database
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cavom-deployer
+subjects:
+  - kind: ServiceAccount
+    name: cavom-deployer
+    namespace: cavom-database

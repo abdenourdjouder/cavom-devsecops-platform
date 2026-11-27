@@ -1,0 +1,89 @@
+.rootless-buildkit:
+  image: docker.io/moby/buildkit:v0.20.2-rootless
+  variables:
+    BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"
+  artifacts:
+    expire_in: 1 day
+
+.frontend-image:
+  extends: .rootless-buildkit
+  stage: build
+  needs:
+    - job: build:frontend
+      artifacts: true
+  script:
+    - ci-cd/scripts/build-image.sh "$FRONTEND_DIR" "$FRONTEND_DOCKERFILE" "$FRONTEND_IMAGE" .oci/frontend.tar
+  artifacts:
+    paths:
+      - .oci/frontend.tar
+
+.backend-image:
+  extends: .rootless-buildkit
+  stage: build
+  needs:
+    - job: build:backend
+      artifacts: true
+  script:
+    - ci-cd/scripts/build-image.sh "$BACKEND_DIR" "$BACKEND_DOCKERFILE" "$BACKEND_IMAGE" .oci/backend.tar
+  artifacts:
+    paths:
+      - .oci/backend.tar
+
+.maven-publish:
+  extends:
+    - .maven
+    - .releasable
+  stage: publish
+  needs:
+    - job: build:backend
+      artifacts: true
+    - job: security:filesystem
+      artifacts: false
+    - job: security:config
+      artifacts: false
+    - job: security:dependencies
+      artifacts: false
+    - job: security:secrets
+      artifacts: false
+  variables:
+    CI_GITLAB_MAVEN_REPOSITORY: $CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/maven
+  script:
+    - ci-cd/scripts/publish-maven.sh
+
+.image-package:
+  extends: .main-or-tag
+  stage: package
+  image: docker.io/library/debian:bookworm-20250317-slim
+  needs:
+    - job: security:frontend-image
+      artifacts: false
+    - job: security:backend-image
+      artifacts: false
+    - job: security:filesystem
+      artifacts: false
+    - job: security:config
+      artifacts: false
+    - job: security:dependencies
+      artifacts: false
+    - job: security:secrets
+      artifacts: false
+    - job: build:frontend-image
+      artifacts: true
+    - job: build:backend-image
+      artifacts: true
+  script:
+    - test -s .oci/frontend.tar
+    - test -s .oci/backend.tar
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - .oci/
+
+.image-publish:
+  extends: .releasable
+  stage: publish
+  image: quay.io/skopeo/stable:v1.18.0
+  variables:
+    SKOPEO_AUTH_FILE: $CI_PROJECT_DIR/.auth/containers.json
+  script:
+    - ci-cd/scripts/publish-images.sh

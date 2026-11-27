@@ -1,0 +1,66 @@
+.trivy:
+  image: docker.io/aquasec/trivy:0.58.1
+  variables:
+    GIT_STRATEGY: fetch
+  before_script:
+    - mkdir -p security/reports "$TRIVY_CACHE_DIR"
+  cache:
+    key: trivy-db
+    paths:
+      - .trivycache/
+
+.trivy-filesystem:
+  extends: .trivy
+  stage: security
+  script:
+    - ci-cd/scripts/trivy-fs.sh
+  artifacts:
+    expire_in: 30 days
+    when: always
+    paths:
+      - security/reports/
+
+.trivy-dependencies:
+  extends: .trivy
+  stage: security
+  script:
+    - ci-cd/scripts/trivy-scan.sh fs application/frontend security/reports/frontend-dependencies --ignorefile security/trivy/.trivyignore --scanners vuln --pkg-types library --config security/trivy/trivy.yaml --severity HIGH,CRITICAL
+    - ci-cd/scripts/trivy-scan.sh fs application/backend security/reports/backend-dependencies --ignorefile security/trivy/.trivyignore --scanners vuln --pkg-types library --config security/trivy/trivy.yaml --severity HIGH,CRITICAL
+  artifacts:
+    expire_in: 30 days
+    when: always
+    paths:
+      - security/reports/
+
+.trivy-secrets:
+  extends: .trivy
+  stage: security
+  script:
+    - ci-cd/scripts/trivy-scan.sh fs . security/reports/secrets --ignorefile security/trivy/.trivyignore --scanners secret --config security/trivy/trivy.yaml
+  artifacts:
+    expire_in: 30 days
+    when: always
+    paths:
+      - security/reports/
+
+.trivy-config:
+  extends: .trivy
+  stage: security
+  script:
+    - ci-cd/scripts/trivy-config.sh
+  artifacts:
+    expire_in: 30 days
+    when: always
+    paths:
+      - security/reports/
+
+.trivy-image:
+  extends: .trivy
+  stage: security
+  script:
+    - ci-cd/scripts/trivy-image.sh "$IMAGE_ARCHIVE" "$IMAGE_REPORT_PREFIX"
+  artifacts:
+    expire_in: 30 days
+    when: always
+    paths:
+      - security/reports/

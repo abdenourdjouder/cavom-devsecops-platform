@@ -1,0 +1,27 @@
+concurrent = 2
+check_interval = 3
+shutdown_timeout = 30
+log_level = "warning"
+
+[[runners]]
+  name = "cavom-non-privileged-shell"
+  url = "https://gitlab.localhost:8443/"
+  clone_url = "https://gitlab/"
+  tls-ca-file = "/etc/gitlab-runner/certs/gitlab.localhost.crt"
+  token = "replace-with-a-gitlab-runner-authentication-token"
+  executor = "shell"
+  shell = "bash"
+  builds_dir = "/workspace/builds"
+  cache_dir = "/workspace/cache"
+  environment = [
+    "BUILDKIT_HOST=unix:///run/buildkit/buildkitd.sock"
+  ]
+
+  [runners.feature_flags]
+    FF_ENABLE_JOB_CLEANUP = true
+
+  [runners.custom_build_dir]
+    enabled = false
+
+  [runners.session_server]
+    session_timeout = 1800

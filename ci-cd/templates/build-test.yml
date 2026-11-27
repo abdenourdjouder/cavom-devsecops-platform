@@ -1,0 +1,44 @@
+.frontend-build:
+  extends: .node
+  stage: build
+  script:
+    - ci-cd/scripts/build-frontend.sh
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - application/frontend/dist/
+
+.backend-build:
+  extends: .maven
+  stage: build
+  script:
+    - ci-cd/scripts/build-backend.sh
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - application/backend/target/
+
+.frontend-test:
+  extends: .node
+  stage: test
+  needs:
+    - job: build:frontend
+      artifacts: false
+  script:
+    - ci-cd/scripts/test-frontend.sh
+
+.backend-test:
+  extends: .maven
+  stage: test
+  needs:
+    - job: build:backend
+      artifacts: false
+  script:
+    - ci-cd/scripts/test-backend.sh
+  artifacts:
+    expire_in: 14 days
+    when: always
+    reports:
+      junit: application/backend/target/surefire-reports/TEST-*.xml
+    paths:
+      - application/backend/target/surefire-reports/

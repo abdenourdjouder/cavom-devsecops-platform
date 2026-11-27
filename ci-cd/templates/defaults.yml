@@ -1,0 +1,60 @@
+default:
+  interruptible: true
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+variables:
+  FRONTEND_DIR: application/frontend
+  BACKEND_DIR: application/backend
+  FRONTEND_DOCKERFILE: application/frontend/Dockerfile
+  BACKEND_DOCKERFILE: application/backend/Dockerfile
+  FRONTEND_IMAGE: $CI_REGISTRY_IMAGE/frontend
+  BACKEND_IMAGE: $CI_REGISTRY_IMAGE/backend
+  TRIVY_VERSION: "0.58.1"
+  TRIVY_CACHE_DIR: $CI_PROJECT_DIR/.trivycache
+  TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
+  TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db:1
+  TRIVY_CHECKS_BUNDLE_REPOSITORY: ghcr.io/aquasecurity/trivy-checks:1
+  MAVEN_CLI_OPTS: --batch-mode --no-transfer-progress --errors
+  K8S_OVERLAY: infrastructure/kubernetes
+  FRONTEND_DEPLOYMENT: frontend
+  FRONTEND_CONTAINER: frontend
+  FRONTEND_NAMESPACE: cavom-frontend
+  BACKEND_DEPLOYMENT: backend
+  BACKEND_CONTAINER: backend
+  BACKEND_NAMESPACE: cavom-backend
+
+.node:
+  image: docker.io/library/node:22.14.0-bookworm-slim
+  before_script:
+    - export npm_config_cache="$CI_PROJECT_DIR/.npm-cache"
+  cache:
+    key:
+      files:
+        - application/frontend/package.json
+    paths:
+      - .npm-cache/
+
+.maven:
+  image: docker.io/library/maven:3.9.9-eclipse-temurin-17
+  before_script:
+    - export MAVEN_OPTS="-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  cache:
+    key:
+      files:
+        - application/backend/pom.xml
+    paths:
+      - .m2/repository/
+
+.main-or-tag:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+
+.releasable:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
