@@ -1,11 +1,20 @@
 const API_BASE = (window.__CAVOM_CONFIG__?.apiBaseUrl || '/api').replace(/\/$/, '');
 
+function csrfToken() {
+  const cookie = document.cookie
+    .split('; ')
+    .find((entry) => entry.startsWith('XSRF-TOKEN='));
+  return cookie ? decodeURIComponent(cookie.slice('XSRF-TOKEN='.length)) : null;
+}
+
 async function request(path, options = {}) {
+  const token = csrfToken();
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       Accept: 'application/json',
       ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(token && options.method && options.method !== 'GET' ? { 'X-XSRF-TOKEN': token } : {}),
       ...options.headers
     }
   });
