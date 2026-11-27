@@ -1,5 +1,5 @@
-external_url ENV.fetch("GITLAB_EXTERNAL_URL", "http://gitlab.localhost:8080")
-registry_external_url ENV.fetch("GITLAB_REGISTRY_EXTERNAL_URL", "http://registry.localhost:5050")
+external_url ENV.fetch("GITLAB_EXTERNAL_URL", "https://gitlab.localhost:8443")
+registry_external_url ENV.fetch("GITLAB_REGISTRY_EXTERNAL_URL", "https://registry.localhost:5443")
 
 gitlab_rails["gitlab_shell_ssh_port"] = ENV.fetch("GITLAB_SSH_PORT", "2222").to_i
 gitlab_rails["packages_enabled"] = true
@@ -10,14 +10,18 @@ gitlab_rails["time_zone"] = "UTC"
 registry["enable"] = true
 registry_nginx["enable"] = true
 registry_nginx["listen_port"] = 5050
-registry_nginx["listen_https"] = false
+registry_nginx["listen_https"] = true
+registry_nginx["ssl_certificate"] = "/etc/gitlab/ssl/registry.localhost.crt"
+registry_nginx["ssl_certificate_key"] = "/etc/gitlab/ssl/registry.localhost.key"
 
-nginx["listen_port"] = 80
-nginx["listen_https"] = false
-nginx["redirect_http_to_https"] = false
+nginx["listen_port"] = 443
+nginx["listen_https"] = true
+nginx["redirect_http_to_https"] = true
+nginx["ssl_certificate"] = "/etc/gitlab/ssl/gitlab.localhost.crt"
+nginx["ssl_certificate_key"] = "/etc/gitlab/ssl/gitlab.localhost.key"
 letsencrypt["enable"] = false
 
-prometheus_monitoring["enable"] = true
+prometheus_monitoring["enable"] = false
 postgresql["shared_buffers"] = "256MB"
 gitlab_rails["env"] = {
   "MALLOC_ARENA_MAX" => "2",

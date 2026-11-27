@@ -24,6 +24,12 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 
 kubectl config current-context
+kubectl apply -f infrastructure/kubernetes/namespaces.yaml
+for namespace in cavom-frontend cavom-backend; do
+  kubectl -n "$namespace" get secret gitlab-regcred >/dev/null
+done
+kubectl -n cavom-backend get secret database-credentials >/dev/null
+kubectl -n cavom-database get secret database-credentials >/dev/null
 kubectl apply -k "$K8S_OVERLAY"
 
 tag=${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}

@@ -13,6 +13,7 @@ resources:
   - backend/service.yaml
   - backend/network-policy.yaml
   - database/service-account.yaml
+  - database/schema-configmap.yaml
   - database/statefulset.yaml
   - database/service.yaml
   - database/network-policy.yaml

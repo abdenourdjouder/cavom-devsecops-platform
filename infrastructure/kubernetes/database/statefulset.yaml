@@ -92,11 +92,17 @@ spec:
               mountPath: /var/run/mysqld
             - name: tmp
               mountPath: /tmp
+            - name: init-schema
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
       volumes:
         - name: mysql-runtime
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+        - name: init-schema
+          configMap:
+            name: mysql-init-schema
   volumeClaimTemplates:
     - metadata:
         name: data

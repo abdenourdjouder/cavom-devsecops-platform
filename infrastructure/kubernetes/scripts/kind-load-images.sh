@@ -2,8 +2,8 @@
 set -euo pipefail
 
 CLUSTER_NAME="${KIND_CLUSTER_NAME:-cavom-devsecops}"
-FRONTEND_IMAGE="${FRONTEND_IMAGE:-registry.gitlab.com/cavom/platform/frontend:latest}"
-BACKEND_IMAGE="${BACKEND_IMAGE:-registry.gitlab.com/cavom/platform/backend:latest}"
+FRONTEND_IMAGE="${FRONTEND_IMAGE:-registry.gitlab.com/cavom/platform/frontend:1.0.0}"
+BACKEND_IMAGE="${BACKEND_IMAGE:-registry.gitlab.com/cavom/platform/backend:1.0.0}"
 
 command -v kind >/dev/null 2>&1 || {
   echo "kind is required" >&2

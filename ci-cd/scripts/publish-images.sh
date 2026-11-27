@@ -7,11 +7,20 @@ set -eu
 
 umask 077
 mkdir -p "$(dirname "$SKOPEO_AUTH_FILE")"
+registry=${GITLAB_INTERNAL_REGISTRY:-$CI_REGISTRY}
+if [ -n "${GITLAB_INTERNAL_REGISTRY:-}" ]; then
+  frontend_image="$registry/$CI_PROJECT_PATH/frontend"
+  backend_image="$registry/$CI_PROJECT_PATH/backend"
+else
+  frontend_image=${FRONTEND_IMAGE:-$CI_REGISTRY_IMAGE/frontend}
+  backend_image=${BACKEND_IMAGE:-$CI_REGISTRY_IMAGE/backend}
+fi
+
 printf '%s' "$CI_JOB_TOKEN" | skopeo login \
   --username "$CI_REGISTRY_USER" \
   --password-stdin \
   --authfile "$SKOPEO_AUTH_FILE" \
-  "$CI_REGISTRY"
+  "$registry"
 
 cleanup() {
   rm -f "$SKOPEO_AUTH_FILE"
@@ -29,16 +38,16 @@ done
 
 skopeo copy --authfile "$SKOPEO_AUTH_FILE" \
   oci-archive:.oci/frontend.tar \
-  "docker://${FRONTEND_IMAGE:-$CI_REGISTRY_IMAGE/frontend}:$tag"
+  "docker://$frontend_image:$tag"
 skopeo copy --authfile "$SKOPEO_AUTH_FILE" \
   oci-archive:.oci/backend.tar \
-  "docker://${BACKEND_IMAGE:-$CI_REGISTRY_IMAGE/backend}:$tag"
+  "docker://$backend_image:$tag"
 
 if [ -n "${CI_DEFAULT_BRANCH:-}" ] && [ "${CI_COMMIT_BRANCH:-}" = "$CI_DEFAULT_BRANCH" ]; then
   skopeo copy --authfile "$SKOPEO_AUTH_FILE" \
     oci-archive:.oci/frontend.tar \
-    "docker://${FRONTEND_IMAGE:-$CI_REGISTRY_IMAGE/frontend}:latest"
+    "docker://$frontend_image:latest"
   skopeo copy --authfile "$SKOPEO_AUTH_FILE" \
     oci-archive:.oci/backend.tar \
-    "docker://${BACKEND_IMAGE:-$CI_REGISTRY_IMAGE/backend}:latest"
+    "docker://$backend_image:latest"
 fi

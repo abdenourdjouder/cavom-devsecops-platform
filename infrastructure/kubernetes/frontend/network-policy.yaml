@@ -22,7 +22,7 @@ spec:
         - ipBlock:
             cidr: 0.0.0.0/0
       ports:
-        - port: 3000
+        - port: 8080
           protocol: TCP
   egress:
     - to:

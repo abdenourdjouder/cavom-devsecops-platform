@@ -36,7 +36,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: backend
-          image: registry.gitlab.com/cavom/platform/backend:latest
+          image: registry.gitlab.com/cavom/platform/backend:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -46,12 +46,12 @@ spec:
             - configMapRef:
                 name: backend-config
           env:
-            - name: DB_USER
+            - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: database-credentials
                   key: username
-            - name: DB_PASSWORD
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: database-credentials
@@ -72,18 +72,18 @@ spec:
               memory: 512Mi
           startupProbe:
             httpGet:
-              path: /healthz
+              path: /actuator/health/liveness
               port: http
             failureThreshold: 30
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /actuator/health/readiness
               port: http
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /actuator/health/liveness
               port: http
             periodSeconds: 20
           volumeMounts:

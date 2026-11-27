@@ -5,7 +5,7 @@ set -eu
 : "${CI_PROJECT_ID:?CI_PROJECT_ID is required by the GitLab runner}"
 : "${CI_API_V4_URL:?CI_API_V4_URL is required by the GitLab runner}"
 
-repository="$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/maven"
+repository="${GITLAB_INTERNAL_API_URL:-$CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/maven"
 umask 077
 mkdir -p "$CI_PROJECT_DIR/.auth"
 cat > "$CI_PROJECT_DIR/.auth/maven-settings.xml" <<EOF

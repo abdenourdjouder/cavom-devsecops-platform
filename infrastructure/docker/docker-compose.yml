@@ -7,24 +7,31 @@ services:
     restart: unless-stopped
     shm_size: 1gb
     environment:
-      GITLAB_EXTERNAL_URL: ${GITLAB_EXTERNAL_URL:-http://gitlab.localhost:8080}
-      GITLAB_REGISTRY_EXTERNAL_URL: ${GITLAB_REGISTRY_EXTERNAL_URL:-http://registry.localhost:5050}
+      GITLAB_EXTERNAL_URL: ${GITLAB_EXTERNAL_URL:-https://gitlab.localhost:8443}
+      GITLAB_REGISTRY_EXTERNAL_URL: ${GITLAB_REGISTRY_EXTERNAL_URL:-https://registry.localhost:5443}
       GITLAB_SSH_PORT: ${GITLAB_SSH_PORT:-2222}
       GITLAB_ROOT_PASSWORD: ${GITLAB_ROOT_PASSWORD:?Set GITLAB_ROOT_PASSWORD in .env}
     volumes:
       - ./gitlab/gitlab.rb:/etc/gitlab/gitlab.rb:ro
+      - ./gitlab/certs:/etc/gitlab/ssl:ro
       - gitlab-config:/etc/gitlab
       - gitlab-logs:/var/log/gitlab
       - gitlab-data:/var/opt/gitlab
     ports:
-      - "127.0.0.1:${GITLAB_HTTP_PORT:-8080}:80"
+      - "127.0.0.1:${GITLAB_HTTPS_PORT:-8443}:443"
       - "127.0.0.1:${GITLAB_SSH_PORT:-2222}:22"
-      - "127.0.0.1:${GITLAB_REGISTRY_PORT:-5050}:5050"
+      - "127.0.0.1:${GITLAB_REGISTRY_PORT:-5443}:5050"
     networks:
-      - edge
-      - backend
+      edge:
+        aliases:
+          - gitlab.localhost
+          - registry.localhost
+      backend:
+        aliases:
+          - gitlab.localhost
+          - registry.localhost
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail --silent --show-error http://127.0.0.1/-/readiness?all=1 >/dev/null"]
+      test: ["CMD-SHELL", "curl --fail --silent --show-error --cacert /etc/gitlab/ssl/gitlab.localhost.crt https://127.0.0.1/-/readiness?all=1 >/dev/null"]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -44,8 +51,11 @@ services:
     environment:
       HOME: /home/gitlab-runner
       BUILDKIT_HOST: unix:///run/buildkit/buildkitd.sock
+      GITLAB_INTERNAL_API_URL: https://gitlab/api/v4
+      GITLAB_INTERNAL_REGISTRY: gitlab:5050
     volumes:
       - ${GITLAB_RUNNER_CONFIG:-./runner/config.toml.example}:/etc/gitlab-runner/config.toml:ro
+      - ./gitlab/certs:/etc/gitlab-runner/certs:ro
       - runner-home:/home/gitlab-runner
       - buildkit-socket:/run/buildkit
     tmpfs:

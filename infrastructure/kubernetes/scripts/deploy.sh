@@ -5,8 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST_DIR="${SCRIPT_DIR}/.."
 CLUSTER_NAME="${KIND_CLUSTER_NAME:-cavom-devsecops}"
 KUBE_CONTEXT="${KUBE_CONTEXT:-kind-${CLUSTER_NAME}}"
-FRONTEND_IMAGE="${FRONTEND_IMAGE:-registry.gitlab.com/cavom/platform/frontend:latest}"
-BACKEND_IMAGE="${BACKEND_IMAGE:-registry.gitlab.com/cavom/platform/backend:latest}"
+FRONTEND_IMAGE="${FRONTEND_IMAGE:-registry.gitlab.com/cavom/platform/frontend:1.0.0}"
+BACKEND_IMAGE="${BACKEND_IMAGE:-registry.gitlab.com/cavom/platform/backend:1.0.0}"
 ROLLOUT_TIMEOUT="${ROLLOUT_TIMEOUT:-5m}"
 
 command -v kubectl >/dev/null 2>&1 || {

@@ -4,6 +4,5 @@ metadata:
   name: backend-config
   namespace: cavom-backend
 data:
-  DB_HOST: mysql.cavom-database.svc.cluster.local
-  DB_PORT: "3306"
-  DB_NAME: cavom
+  DB_URL: jdbc:mysql://mysql.cavom-database.svc.cluster.local:3306/cavom
+  ALLOWED_ORIGIN: http://localhost:30080

@@ -41,6 +41,10 @@
       artifacts: false
     - job: security:config
       artifacts: false
+    - job: security:dependencies
+      artifacts: false
+    - job: security:secrets
+      artifacts: false
   variables:
     CI_GITLAB_MAVEN_REPOSITORY: $CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/maven
   script:
@@ -54,6 +58,14 @@
     - job: security:frontend-image
       artifacts: false
     - job: security:backend-image
+      artifacts: false
+    - job: security:filesystem
+      artifacts: false
+    - job: security:config
+      artifacts: false
+    - job: security:dependencies
+      artifacts: false
+    - job: security:secrets
       artifacts: false
     - job: build:frontend-image
       artifacts: true

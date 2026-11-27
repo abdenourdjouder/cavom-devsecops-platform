@@ -5,8 +5,9 @@ log_level = "warning"
 
 [[runners]]
   name = "cavom-non-privileged-shell"
-  url = "http://gitlab/"
-  clone_url = "http://gitlab/"
+  url = "https://gitlab.localhost:8443/"
+  clone_url = "https://gitlab/"
+  tls-ca-file = "/etc/gitlab-runner/certs/gitlab.localhost.crt"
   token = "replace-with-a-gitlab-runner-authentication-token"
   executor = "shell"
   shell = "bash"

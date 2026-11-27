@@ -27,3 +27,14 @@ CREATE TABLE IF NOT EXISTS contributions (
   CONSTRAINT ck_contributions_amount CHECK (amount > 0),
   INDEX idx_contributions_member_date (member_id, contributed_on)
 ) ENGINE=InnoDB;
+
+INSERT INTO members (name, email)
+VALUES ('Amina Diallo', 'amina.diallo@example.invalid'),
+       ('Thomas Martin', 'thomas.martin@example.invalid')
+ON DUPLICATE KEY UPDATE email = VALUES(email);
+
+INSERT INTO contributions (member_id, amount, description, contributed_on)
+SELECT id, 45.00, 'Cotisation annuelle 2026', '2026-01-15'
+FROM members
+WHERE email = 'amina.diallo@example.invalid'
+ON DUPLICATE KEY UPDATE amount = VALUES(amount);
