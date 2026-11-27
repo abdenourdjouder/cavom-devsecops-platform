@@ -1,0 +1,21 @@
+# TEMPLATE ONLY: replace every PLACEHOLDER before use; never commit populated values.
+# Apply separately in both cavom-frontend and cavom-backend.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-regcred
+  namespace: cavom-frontend
+type: kubernetes.io/dockerconfigjson
+stringData:
+  .dockerconfigjson: >-
+    {"auths":{"registry.gitlab.com":{"username":"PLACEHOLDER_GITLAB_DEPLOY_USERNAME","password":"PLACEHOLDER_GITLAB_DEPLOY_TOKEN","email":"PLACEHOLDER_EMAIL","auth":"PLACEHOLDER_BASE64_USERNAME_COLON_TOKEN"}}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-regcred
+  namespace: cavom-backend
+type: kubernetes.io/dockerconfigjson
+stringData:
+  .dockerconfigjson: >-
+    {"auths":{"registry.gitlab.com":{"username":"PLACEHOLDER_GITLAB_DEPLOY_USERNAME","password":"PLACEHOLDER_GITLAB_DEPLOY_TOKEN","email":"PLACEHOLDER_EMAIL","auth":"PLACEHOLDER_BASE64_USERNAME_COLON_TOKEN"}}}

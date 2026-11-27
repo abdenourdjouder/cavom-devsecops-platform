@@ -1,0 +1,22 @@
+.sonar-quality:
+  stage: quality
+  image: docker.io/sonarsource/sonar-scanner-cli:11.2.2.18815
+  needs:
+    - job: test:frontend
+      artifacts: false
+      optional: true
+    - job: test:backend
+      artifacts: true
+      optional: true
+    - job: build:backend
+      artifacts: true
+  script:
+    - ci-cd/scripts/sonar-scan.sh
+  artifacts:
+    expire_in: 14 days
+    when: always
+    paths:
+      - .scannerwork/report-task.txt
+      - .sonar/quality-gate.txt
+  rules:
+    - if: '$SONAR_TOKEN && $SONAR_HOST_URL'

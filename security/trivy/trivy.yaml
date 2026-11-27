@@ -1,0 +1,21 @@
+cache:
+  dir: .trivycache
+db:
+  repository:
+    - ghcr.io/aquasecurity/trivy-db:2
+java-db:
+  repository:
+    - ghcr.io/aquasecurity/trivy-java-db:1
+misconfiguration:
+  checks-bundle-repository: ghcr.io/aquasecurity/trivy-checks:1
+severity:
+  - HIGH
+  - CRITICAL
+ignore-unfixed: true
+skip-dirs:
+  - .git
+  - .m2
+  - .npm-cache
+  - .trivycache
+exit-code: 0
+timeout: 15m

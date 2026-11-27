@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cavom-frontend
+  labels:
+    cavom.dev/tier: frontend
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cavom-backend
+  labels:
+    cavom.dev/tier: backend
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cavom-database
+  labels:
+    cavom.dev/tier: database

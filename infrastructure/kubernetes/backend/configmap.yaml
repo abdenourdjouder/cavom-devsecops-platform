@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: cavom-backend
+data:
+  DB_HOST: mysql.cavom-database.svc.cluster.local
+  DB_PORT: "3306"
+  DB_NAME: cavom
